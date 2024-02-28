@@ -1,0 +1,49 @@
+version: '3'
+
+services:
+  # Service PHP 8 avec Apache
+  php-apache:
+    image: php:8.0-apache
+    ports:
+      - "8083:80"
+    volumes:
+      - ./:/var/www/html
+    networks:
+      - app-network
+
+  # Service MariaDB
+  mariadbphp:
+    image: mariadb
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: your_root_password
+      MYSQL_DATABASE: your_database
+      MYSQL_USER: your_username
+      MYSQL_PASSWORD: your_password
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    networks:
+      - app-network
+
+  # Service PHPMyAdmin
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    links:
+      - mariadbphp
+    ports:
+      - "8082:80"
+    environment:
+      PMA_HOST: mariadb
+      MYSQL_ROOT_PASSWORD: your_root_password
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mariadb-data:
+    driver: local
+
